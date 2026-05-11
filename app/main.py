@@ -11,6 +11,7 @@ app = FastAPI(title="Agentic Banking CRM")
 allowed_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://agentic-banking-crm.vercel.app",
 ]
 
 app.add_middleware(
