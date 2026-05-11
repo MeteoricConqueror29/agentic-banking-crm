@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
+
 from app.models.customer_intelligence import HighValueCustomerFilters
 from app.services.duckdb_service import DuckDBService
 from app.tools.customer_tool import CustomerIntelligenceTool
+from app.tools.transaction_tool import TransactionAnalysisTool
 
 router = APIRouter()
 
@@ -16,6 +18,7 @@ def health_check():
 
 db_service = DuckDBService(auto_initialize=True)
 customer_tool = CustomerIntelligenceTool(db_service)
+transaction_tool = TransactionAnalysisTool(db_service)
 
 
 @router.get("/high-value-customers")
@@ -29,4 +32,17 @@ def get_high_value_customers():
 
     result = customer_tool.find_high_value_customers(filters)
 
+    return result.model_dump()
+
+
+@router.get("/customers/{customer_id}/transaction-analysis")
+def get_customer_transaction_analysis(
+    customer_id: str,
+    top_categories: int = Query(5, ge=0, le=50),
+):
+    """Return structured transaction metrics and behavioral indicators for one customer."""
+    result = transaction_tool.analyze_customer_transactions(
+        customer_id,
+        top_categories=top_categories,
+    )
     return result.model_dump()
