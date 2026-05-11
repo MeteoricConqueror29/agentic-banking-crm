@@ -2,7 +2,9 @@ from fastapi import APIRouter, Query
 
 from app.models.customer_intelligence import HighValueCustomerFilters
 from app.models.outreach import OutreachMessageResponse
+from app.models.planner import PlannerResponse
 from app.models.recommendation import RecommendationResponse
+from app.orchestrator.planner import Planner
 from app.services.duckdb_service import DuckDBService
 from app.tools.customer_tool import CustomerIntelligenceTool
 from app.tools.outreach_tool import OutreachTool
@@ -25,6 +27,7 @@ customer_tool = CustomerIntelligenceTool(db_service)
 transaction_tool = TransactionAnalysisTool(db_service)
 recommendation_tool = RecommendationTool(customer_tool, transaction_tool)
 outreach_tool = OutreachTool(customer_tool, transaction_tool, recommendation_tool)
+planner = Planner(customer_tool, transaction_tool, recommendation_tool, outreach_tool)
 
 
 @router.get("/high-value-customers")
@@ -66,3 +69,17 @@ def get_customer_outreach_message(customer_id: str):
     """Generate personalized outreach messages for one customer."""
     result = outreach_tool.generate_outreach_message(customer_id)
     return result
+
+
+@router.get("/planner/run", response_model=PlannerResponse)
+def run_planner(
+    query: str = Query(..., min_length=1, description="Free-form relationship manager request."),
+    max_customers: int = Query(5, ge=1, le=25, description="Cap on customers processed in detail."),
+    generate_outreach: bool = Query(True, description="Set false to skip outreach generation for faster responses."),
+):
+    """Orchestrate customer, transaction, recommendation, and outreach tools for one RM query."""
+    return planner.run(
+        query,
+        generate_outreach=generate_outreach,
+        max_customers=max_customers,
+    )
