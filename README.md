@@ -13,7 +13,7 @@ The solution is split into cleanly separated backend layers (`API`, `orchestrato
 
 ## 2) Objective of the Assignment
 
-Build a recruiter-ready, modular agentic application that:
+Build a modular agentic application that:
 - Understands an RM's natural-language query.
 - Maps intent to banking-specific targeting logic.
 - Orchestrates customer intelligence, transaction analysis, recommendation scoring, and outreach generation.
@@ -99,7 +99,7 @@ This separation makes the system highly extensible and easy to evolve without co
 - **Zero external DB ops overhead** (single file, easy setup for assignment/demo).
 - **Direct CSV ingestion** (`read_csv_auto`) aligns with provided processed datasets.
 - **SQL + DataFrame ergonomics** supports both deterministic analytics and rapid iteration.
-- **Portable and reproducible** for reviewer machines and recruiter demos.
+- **Portable and reproducible** for reviewer machines and demos.
 
 ---
 
@@ -141,6 +141,19 @@ sequenceDiagram
 - Tools remain focused and side-effect-light.
 - Intent and filtering logic stay centralized, making future intents easy to add (rule + plan factory).
 - Per-customer processing cap controls latency and keeps responses predictable.
+
+
+## Why This System Is Agentic
+This system follows an agentic execution pattern rather than a single hardcoded workflow.
+The planner dynamically:
+- interprets RM intent,
+- selects appropriate tools,
+- orchestrates multi-step execution,
+- maintains execution state,
+- aggregates intermediate outputs,
+- and produces explainable final responses.
+
+Each tool is modular, independently executable, and coordinated through a centralized orchestration layer, enabling extensibility for future banking intelligence capabilities.
 
 ---
 
