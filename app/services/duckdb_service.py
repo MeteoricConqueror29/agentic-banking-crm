@@ -7,6 +7,7 @@ customers and transactions loaded from the processed CSV exports.
 from __future__ import annotations
 
 import logging
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -110,6 +111,10 @@ class DuckDBService:
     def fetch_dataframe(self, query: str) -> pd.DataFrame:
         """Execute ``query`` and return the result as a pandas DataFrame."""
         return self.connection.execute(query).df()
+
+    def fetch_dataframe_params(self, query: str, parameters: Sequence[Any]) -> pd.DataFrame:
+        """Execute a parameterized ``query`` and return rows as a DataFrame."""
+        return self.connection.execute(query, list(parameters)).df()
 
     def fetch_one(self, query: str) -> Any:
         """Execute ``query`` and return a single row (or ``None`` if no rows)."""
