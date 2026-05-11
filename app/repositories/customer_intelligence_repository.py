@@ -106,3 +106,25 @@ class CustomerIntelligenceRepository:
             customers=customers,
             total_matching=len(customers),
         )
+
+    def fetch_customer_by_id(
+        self,
+        customer_id: str,
+        *,
+        table: str | None = None,
+    ) -> HighValueCustomer | None:
+        """Return one customer profile by ``customer_id`` or ``None`` if absent."""
+        resolved_table = table or DuckDBService.CUSTOMERS_TABLE
+        safe_table = _assert_safe_table_identifier(resolved_table)
+        columns_sql = ", ".join(_CUSTOMER_SELECT_COLUMNS)
+        sql = f"""
+            SELECT {columns_sql}
+            FROM {safe_table}
+            WHERE customer_id = ?
+            LIMIT 1
+        """.strip()
+        df = self._db.fetch_dataframe_params(sql, [customer_id])
+        customers = _rows_to_customers(df)
+        if not customers:
+            return None
+        return customers[0]

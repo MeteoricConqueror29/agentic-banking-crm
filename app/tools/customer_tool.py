@@ -56,3 +56,12 @@ class CustomerIntelligenceTool:
         """
         resolved = filters or HighValueCustomerFilters()
         return self._repository.fetch_high_value_customers(resolved, table=table)
+
+    def get_customer_profile(
+        self,
+        customer_id: str,
+        *,
+        table: str | None = None,
+    ) -> HighValueCustomer | None:
+        """Fetch one customer profile by identifier."""
+        return self._repository.fetch_customer_by_id(customer_id, table=table)
