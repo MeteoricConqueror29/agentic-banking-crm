@@ -8,3 +8,5 @@ data/raw/
 data/processed/
 *.duckdb
 *.wal
+node_modules/
+frontend/dist/
