@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Query
 
+from app.models.api_analysis import AnalyzeRequest, AnalyzeResponse
 from app.models.customer_intelligence import HighValueCustomerFilters
 from app.models.outreach import OutreachMessageResponse
 from app.models.planner import PlannerResponse
@@ -83,3 +84,10 @@ def run_planner(
         generate_outreach=generate_outreach,
         max_customers=max_customers,
     )
+
+
+@router.post("/analyze", response_model=AnalyzeResponse)
+def analyze_customer_opportunities(payload: AnalyzeRequest):
+    """Run planner orchestration and return a clean API analysis payload."""
+    planner_result = planner.run(payload.query)
+    return AnalyzeResponse.from_planner_response(planner_result)
